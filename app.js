@@ -1,43 +1,63 @@
 const express = require('express');
+const request = require('request');
 const https = require('https');
-
+ 
 const app = express();
+ 
 app.use(express.json());
 app.use(express.urlencoded({
-  extended: true
+    extended: true
 }));
-
+ 
 app.use(express.static('public'));
-
-app.listen(3000, function(){
-    console.log('Server is running');
-})
-
-https.get(, res => {
-  let data = [];
-  const headerDate = res.headers && res.headers.date ? res.headers.date : 'no response date';
-  console.log('Status Code:', res.statusCode);
-  console.log('Date in Response header:', headerDate);
-
-  res.on('data', chunk => {
-    data.push(chunk);
-  });
-
-  res.on('end', () => {
-    console.log('Response ended: ');
-    const users = JSON.parse(Buffer.concat(data).toString());
-
-    for(user of users) {
-      console.log(`Got user with id: ${user.id}, name: ${user.name}`);
-    }
-  });
-}).on('error', err => {
-  console.log('Error: ', err.message);
+ 
+app.get('/', function(req, res){
+    res.sendFile(__dirname + "/signup.html");
 });
-
-
-app.post("/", function(req, res){
- var firstName = req.body.fname;
- var lastName = req.body.lname;
- var email = req.body.email;
-})
+ 
+app.post('/', (req, res) =>{
+    const firstName = req.body.fName;
+    const lastName = req.body.lName;
+    const email = req.body.email;
+ 
+    const data = {
+        members:[{
+            email_address: email,
+            status: "subscribed",
+            merge_fields: {
+                FNAME: firstName,
+                LNAME: lastName
+            }
+        }]
+    }
+ 
+    const jsonData = JSON.stringify(data);
+ 
+    const url = "https://us1.api.mailchimp.com/3.0/lists/ac344b6ae4";
+ 
+    const options = {
+        method: "POST",
+        auth: "danitacodes:9d5d4d45add076cdf0853889088c1ca2-us1"
+    };
+    const request = https.request(url, options, function(response){
+            response.on("data", function(data){
+            console.log(JSON.parse(data));
+    })
+    request.write(jsonData);
+    request.end();
+ 
+});
+ 
+app.post("/failure.html", function(req, res){
+    res.sendFile(__dirname + "/signup.html");
+});
+ 
+app.listen (3000, function(){
+    console.log("Server is running");
+});
+ 
+  //API Key
+//9d5d4d45add076cdf0853889088c1ca2-us1
+ 
+//List ID
+//ac344b6ae4
