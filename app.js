@@ -56,8 +56,4 @@ app.listen (3000, function(){
     console.log("Server is running");
 });
  
-  //API Key
-//9d5d4d45add076cdf0853889088c1ca2-us1
- 
-//List ID
-//ac344b6ae4
+
